@@ -12,27 +12,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Tailwind CDN */}
         <script src="https://cdn.tailwindcss.com"></script>
 
-        {/* 구글 애드센스 심사 연동 코드 */}
+        {/* 구글 애드센스 */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7587381512055029"
           crossOrigin="anonymous"
         ></script>
 
-        {/* 프리텐다드 폰트 */}
+        {/* 상업용 무료 볼드 만화 손글씨 폰트 (Maple 단풍나무체) */}
         <link
           rel="stylesheet"
-          as="style"
-          crossOrigin="anonymous"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"
+          href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/MaplestoryOTFBold.woff2"
         />
+
+        {/* 레트로 만화 하프톤 도트 배경 스타일 정의 */}
         <style>{`
-          * {
-            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+          @font-face {
+            font-family: 'ComicBold';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/MaplestoryOTFBold.woff2') format('woff2');
+            font-weight: 700;
+            font-display: swap;
+          }
+          
+          .comic-title {
+            font-family: 'ComicBold', cursive, sans-serif;
+          }
+
+          /* 만화책 특유의 회색 도트 망점 배경 */
+          .comic-bg {
+            background-color: #d1d5db;
+            background-image: radial-gradient(#9ca3af 20%, transparent 20%);
+            background-position: 0 0;
+            background-size: 16px 16px;
           }
         `}</style>
       </head>
-      <body className="bg-slate-50 text-slate-800 antialiased">{children}</body>
+      <body className="comic-bg text-slate-900 antialiased">{children}</body>
     </html>
   );
 }
