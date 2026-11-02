@@ -1,8 +1,18 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: '오늘의 성향 연구소 | 1분 오피스 성향 진단',
-  description: '직장 상사 대처, 월급 탈곡기 영수증, 회의실 마피아, 친구관계 성적표 테스트',
+  description: '1분 만에 까발리는 오피스 생존 본능! 내 퇴사 타이머와 영수증을 확인해보세요.',
+  metadataBase: new URL('https://ssm-opal.vercel.app'),
+  openGraph: {
+    title: '오늘의 성향 연구소 💣',
+    description: '1분 만에 까발리는 오피스 생존 본능! 당신의 퇴사 시한폭탄 타이머는 며칠?',
+    url: 'https://ssm-opal.vercel.app',
+    siteName: '오늘의 성향 연구소',
+    locale: 'ko_KR',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -61,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased min-h-screen selection:bg-rose-500 selection:text-white">
         {children}
+        <Analytics />
       </body>
     </html>
   );
