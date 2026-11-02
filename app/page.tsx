@@ -1,6 +1,13 @@
 import Link from 'next/link';
-
 const TEST_LIST = [
+  {
+    id: 'chiikawa',
+    title: '먼가 작고 찌든 녀석들 테스트',
+    desc: '눈물샘 찌이? 샤우팅 토끼? 나의 오피스 생존 캐릭터',
+    emoji: '🌸',
+    tag: '초인기',
+    accent: 'bg-pink-500 text-white'
+  },
   {
     id: 'salary-receipt',
     title: '월급 탈곡기 영수증 테스트',
