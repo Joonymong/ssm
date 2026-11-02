@@ -4,12 +4,18 @@ import Link from 'next/link';
 const TEST_LIST = [
   {
     id: 'office-boss',
-    title: '직장 상사 분노 유발 성향 테스트',
+    title: '직장 상사 분노 성향 테스트',
     subtitle: '극대노 상황에서 드러나는 나의 오피스 생존 본능',
     emoji: '🔥',
     badge: '인기'
   },
-  // 새 테스트는 여기에 { id: 'money-test', title: '...', ... } 형태로 추가
+  {
+    id: 'meeting-mafia',
+    title: '회의실 침묵의 마피아 테스트',
+    subtitle: '"자유롭게 의견 내봐" 소리에 반응하는 생존 유형',
+    emoji: '🕶️',
+    badge: 'NEW'
+  }
 ];
 
 export default function Home() {
