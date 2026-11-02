@@ -56,6 +56,23 @@ export default function Home() {
           ))}
         </div>
 
+        
+{/* 칼럼 바로가기 배너 (테스트 카드 목록 바로 아래에 배치) */}
+<div className="mt-8 p-4 bg-indigo-50/70 border border-indigo-100 rounded-2xl flex items-center justify-between">
+  <div>
+    <span className="text-[10px] font-bold text-indigo-600 bg-white px-2 py-0.5 rounded-full">심리 리포트</span>
+    <h3 className="text-xs font-bold text-slate-800 mt-1">상사 갈등 & 번아웃 대처 가이드 읽기</h3>
+  </div>
+  <Link
+    href="/column"
+    className="text-xs font-bold bg-indigo-600 text-white px-3 py-2 rounded-xl hover:bg-indigo-700 transition"
+  >
+    읽어보기
+  </Link>
+</div>
+
+
+        
         <footer className="mt-12 text-center text-xs text-slate-400">
           <p>© 2026 Mind Lab. All rights reserved.</p>
         </footer>
