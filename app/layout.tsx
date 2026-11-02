@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: '오늘의 성향 연구소 | 1분 오피스 성향 진단',
@@ -26,10 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin="anonymous"
         ></script>
 
-        {/* 2. Tailwind CSS CDN */}
+        {/* 2. Vercel Web Analytics 스크립트 (모듈 설치 없이 바로 방문자 집계) */}
+        <script defer src="/_vercel/insights/script.js"></script>
+
+        {/* 3. Tailwind CSS CDN */}
         <script src="https://cdn.tailwindcss.com"></script>
 
-        {/* 3. 프리텐다드(Pretendard) 공식 가변 폰트 CDN */}
+        {/* 4. 프리텐다드(Pretendard) 공식 가변 폰트 CDN */}
         <link
           rel="stylesheet"
           as="style"
@@ -37,13 +39,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
         />
 
-        {/* 4. 레트로 만화 타이틀용 볼드 폰트 CDN */}
+        {/* 5. 레트로 만화 타이틀용 볼드 폰트 CDN */}
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/MaplestoryOTFBold.woff2"
         />
 
-        {/* 5. 폰트 깨짐 방지 강제 적용 및 만화 도트 스타일 */}
+        {/* 6. 폰트 강제 적용 및 만화 도트 스타일 */}
         <style>{`
           * {
             font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif !important;
@@ -71,7 +73,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased min-h-screen selection:bg-rose-500 selection:text-white">
         {children}
-        <Analytics />
       </body>
     </html>
   );
