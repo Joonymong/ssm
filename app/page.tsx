@@ -1,5 +1,13 @@
 import Link from 'next/link';
 const TEST_LIST = [
+    {
+    id: 'quit-timer',
+    title: '직장인 퇴사 충동 타이머',
+    desc: '실시간 시한폭탄! 내가 사직서 던지기까지 남은 시간은?',
+    emoji: '💣',
+    tag: 'NEW 킬러',
+    accent: 'bg-red-600 text-white'
+  },
   {
     id: 'chiikawa',
     title: '먼가 작고 찌든 녀석들 테스트',
