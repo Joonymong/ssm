@@ -1,5 +1,13 @@
 import Link from 'next/link';
 const TEST_LIST = [
+{
+    id: 'fate-travel',
+    title: '사주 X 성향 운명 여행지 진단',
+    desc: '생년월일시와 나의 성향이 만났을 때, 전 세계에 숨겨진 운명의 땅은?',
+    emoji: '✈️🔮',
+    tag: '초강추',
+    accent: 'bg-amber-800 text-white'
+  },
     {
     id: 'quit-timer',
     title: '직장인 퇴사 충동 타이머',
