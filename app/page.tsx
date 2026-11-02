@@ -3,6 +3,13 @@ import Link from 'next/link';
 // 앞으로 테스트가 늘어나면 이 목록에 한 줄씩 추가만 하면 됩니다.
 const TEST_LIST = [
   {
+    id: 'salary-receipt',
+    title: '월급 탈곡기 영수증 테스트',
+    subtitle: '스쳐 지나간 280만 원, 범인은 직장 상사 홧김비용',
+    emoji: '🧾',
+    badge: 'HOT 바이럴'
+  },
+  {
     id: 'office-boss',
     title: '직장 상사 분노 성향 테스트',
     subtitle: '극대노 상황에서 드러나는 나의 오피스 생존 본능',
