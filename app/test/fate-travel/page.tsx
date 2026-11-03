@@ -33,14 +33,14 @@ const JIJI_HOURS = [
   { label: '태어난 시간 모름', name: '시간미상', element: 'NONE' }
 ];
 
-// 2. 7개의 상황극 질문
+// 2. 7개의 상황극 질문 (각 선택지가 명확한 성향 축 점수를 가짐)
 interface QuestionItem {
   stepTitle: string;
   question: string;
   bg: string;
   mainEmoji: string;
   subEmojis: string;
-  options: { text: string; tag: string }[];
+  options: { text: string; cityDelta: number; activeDelta: number; isPlan?: boolean; isHeal?: boolean }[];
 }
 
 const QUIZ_STEPS: QuestionItem[] = [
@@ -51,8 +51,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '🛫',
     subEmojis: '🧳 🎫 ☕',
     options: [
-      { text: '시간대별 동선과 맛집 구글맵 링크가 빽빽하게 정리된 계획표 📝', tag: 'PLAN_J' },
-      { text: '비행기 표와 여권, 그리고 첫날 잘 숙소 주소만 달랑 적힌 메모 🎒', tag: 'PLAN_P' }
+      { text: '시간대별 동선과 맛집 구글맵 링크가 빽빽하게 정리된 계획표 📝', cityDelta: 1, activeDelta: 1, isPlan: true },
+      { text: '비행기 표와 여권, 그리고 첫날 잘 숙소 주소만 달랑 적힌 메모 🎒', cityDelta: -1, activeDelta: -1, isPlan: false }
     ]
   },
   {
@@ -62,8 +62,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '🪟',
     subEmojis: '☁️ ✨ 🌍',
     options: [
-      { text: '화려한 랜드마크와 감각적인 편집샵, 낭만적인 골목이 얽힌 매력적인 도시 🏙️', tag: 'SCENE_CITY' },
-      { text: '인간의 손길이 닿지 않은 거대한 설산, 에메랄드빛 바다와 끝없는 숲 🏞️', tag: 'SCENE_NATURE' }
+      { text: '화려한 랜드마크와 감각적인 편집샵, 낭만적인 골목이 얽힌 매력적인 도시 🏙️', cityDelta: 2, activeDelta: 1 },
+      { text: '인간의 손길이 닿지 않은 거대한 설산, 에메랄드빛 바다와 끝없는 숲 🏞️', cityDelta: -2, activeDelta: -1 }
     ]
   },
   {
@@ -73,8 +73,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '☀️',
     subEmojis: '👟 🕶️ 📷',
     options: [
-      { text: '여기까지 왔는데 다 봐야지! 유명 스팟과 액티비티를 알차게 도장 깨기 🔥', tag: 'TEMPO_ACTIVE' },
-      { text: '알람 없이 푹 자고 일어나 뷰 좋은 카페나 해변에 누워 한량처럼 유유자적 🍵', tag: 'TEMPO_CHILL' }
+      { text: '여기까지 왔는데 다 봐야지! 유명 스팟과 액티비티를 알차게 도장 깨기 🔥', cityDelta: 1, activeDelta: 2 },
+      { text: '알람 없이 푹 자고 일어나 뷰 좋은 카페나 해변에 누워 한량처럼 유유자적 🍵', cityDelta: -1, activeDelta: -2 }
     ]
   },
   {
@@ -84,8 +84,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '🧭',
     subEmojis: '🏘️ 🐈 🎈',
     options: [
-      { text: '현지인들이 줄 서 있는 시끌벅적한 시장과 화려한 중심가 쪽으로 직진! 🎪', tag: 'SCENE_CITY' },
-      { text: '사람 소리 대신 바람과 파도, 나무 냄새가 솔솔 나는 한적한 외곽 길로 산책 🌿', tag: 'SCENE_NATURE' }
+      { text: '현지인들이 줄 서 있는 시끌벅적한 시장과 화려한 중심가 쪽으로 직진! 🎪', cityDelta: 2, activeDelta: 1 },
+      { text: '사람 소리 대신 바람과 파도, 나무 냄새가 솔솔 나는 한적한 외곽 길로 산책 🌿', cityDelta: -2, activeDelta: -1 }
     ]
   },
   {
@@ -95,8 +95,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '🌙',
     subEmojis: '🍷 🎆 🕯️',
     options: [
-      { text: '화려한 루프탑 바나 야시장, 뮤지컬 공연장에서 밤의 에너지를 만끽하기 🥂', tag: 'TEMPO_ACTIVE' },
-      { text: '모닥불이나 노천 온천, 조용한 테라스에서 별을 보며 맥주 한 캔 마시기 🌌', tag: 'TEMPO_CHILL' }
+      { text: '화려한 루프탑 바나 야시장, 뮤지컬 공연장에서 밤의 에너지를 만끽하기 🥂', cityDelta: 1, activeDelta: 2 },
+      { text: '모닥불이나 노천 온천, 조용한 테라스에서 별을 보며 맥주 한 캔 마시기 🌌', cityDelta: -1, activeDelta: -2 }
     ]
   },
   {
@@ -106,8 +106,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '🔮',
     subEmojis: '⚡ 💧 🍀',
     options: [
-      { text: '잠들어 있던 내 본성과 열정, 영감을 200% 폭발시켜 줄 강렬한 자극! ⚡', tag: 'STYLE_BOOST' },
-      { text: '현생에 지치고 닳아버린 멘탈을 부드럽게 감싸 안아줄 빈틈없는 위로와 보충 💧', tag: 'STYLE_HEAL' }
+      { text: '잠들어 있던 내 본성과 열정, 영감을 200% 폭발시켜 줄 강렬한 자극! ⚡', cityDelta: 1, activeDelta: 1, isHeal: false },
+      { text: '현생에 지치고 닳아버린 멘탈을 부드럽게 감싸 안아줄 빈틈없는 위로와 보충 💧', cityDelta: -1, activeDelta: -1, isHeal: true }
     ]
   },
   {
@@ -117,8 +117,8 @@ const QUIZ_STEPS: QuestionItem[] = [
     mainEmoji: '🎁',
     subEmojis: '🛍️ 📮 🎞️',
     options: [
-      { text: '이 도시에서만 살 수 있는 트렌디한 아이템과 감도 높은 맛집 투어 완수 🛍️', tag: 'SCENE_CITY' },
-      { text: '카메라에도 다 안 담기는 대자연의 풍경을 눈과 마음에 끝까지 담아두기 🏔️', tag: 'SCENE_NATURE' }
+      { text: '이 도시에서만 살 수 있는 트렌디한 아이템과 감도 높은 맛집 투어 완수 🛍️', cityDelta: 2, activeDelta: 1 },
+      { text: '카메라에도 다 안 담기는 대자연의 풍경을 눈과 마음에 끝까지 담아두기 🏔️', cityDelta: -2, activeDelta: -1 }
     ]
   }
 ];
@@ -354,17 +354,17 @@ export default function FateTravelTest() {
   const [birthDay, setBirthDay] = useState(15);
   const [hourIdx, setHourIdx] = useState(6);
 
-  // STEP 2: 퀴즈 진행 상태 및 성향 점수 누적
+  // STEP 2: 퀴즈 진행 상태 및 선택한 옵션 객체 누적
   const [quizIdx, setQuizIdx] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
 
   const saju = calculateSaju(birthYear, birthMonth, birthDay, hourIdx);
 
-  // 질문 선택 시 다음 스텝으로 이동
-  const handleSelectOption = (tag: string) => {
-    const nextAnswers = [...answers, tag];
-    setAnswers(nextAnswers);
+  // 질문 선택 시 점수 누적 후 다음 스텝으로 이동
+  const handleSelectOption = (opt: any) => {
+    const nextOptions = [...selectedOptions, opt];
+    setSelectedOptions(nextOptions);
 
     if (quizIdx + 1 < QUIZ_STEPS.length) {
       setQuizIdx(quizIdx + 1);
@@ -376,27 +376,37 @@ export default function FateTravelTest() {
     }
   };
 
-  // 이전 질문으로 되돌아가기
   const handlePrevQuestion = () => {
     if (quizIdx > 0) {
       setQuizIdx(quizIdx - 1);
-      setAnswers(answers.slice(0, -1));
+      setSelectedOptions(selectedOptions.slice(0, -1));
     } else {
       setStep('saju');
     }
   };
 
-  // 사주 오행 + 7문항 성향 응답을 합산해 최종 여행지 결정
+  // 사주 오행 + 7문항의 누적 점수를 결합해 20개 도시 중 최종 결정
   const getFinalDestination = () => {
-    const countTag = (t: string) => answers.filter((a) => a === t).length;
+    let cityScore = 0;
+    let activeScore = 0;
+    let healCount = 0;
+    let planCount = 0;
 
-    const isCity = countTag('SCENE_CITY') >= countTag('SCENE_NATURE');
-    const isActive = countTag('TEMPO_ACTIVE') >= countTag('TEMPO_CHILL');
-    const isHeal = countTag('STYLE_HEAL') > 0;
-    const isPlanJ = countTag('PLAN_J') > 0;
+    selectedOptions.forEach((opt) => {
+      cityScore += opt.cityDelta || 0;
+      activeScore += opt.activeDelta || 0;
+      if (opt.isHeal) healCount++;
+      if (opt.isPlan) planCount++;
+    });
+
+    const isCity = cityScore >= 0;
+    const isActive = activeScore >= 0;
+    const isHeal = healCount > 0;
+    const isPlanJ = planCount >= 1;
 
     let targetElem = saju.dayMaster.element;
     if (isHeal) {
+      // 힐링/보충 성향이 있으면 내 사주에서 가장 부족한 오행을 타겟으로 설정
       const sorted = Object.entries(saju.counts).sort((a, b) => a[1] - b[1]);
       targetElem = sorted[0][0];
     }
@@ -450,7 +460,6 @@ export default function FateTravelTest() {
         {/* 1단계: 사주 입력 */}
         {step === 'saju' && (
           <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-6">
-            
             <div className="text-center space-y-1.5">
               <span className="inline-block bg-amber-300 border-2 border-stone-900 px-3 py-0.5 rounded-full text-sm font-bold">
                 🧭 1단계: 나의 타고난 사주 입력
@@ -538,7 +547,7 @@ export default function FateTravelTest() {
             </div>
 
             <button
-              onClick={() => { setQuizIdx(0); setAnswers([]); setStep('quiz'); }}
+              onClick={() => { setQuizIdx(0); setSelectedOptions([]); setStep('quiz'); }}
               className="w-full py-4 bg-amber-300 hover:bg-amber-400 text-stone-900 text-xl font-bold rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917] active:translate-x-[2px] active:translate-y-[2px] transition"
             >
               다음: 여행 성향 질문 시작하기 (1/7) ➔
@@ -549,7 +558,6 @@ export default function FateTravelTest() {
         {/* 2단계: 7문항 성향 퀴즈 */}
         {step === 'quiz' && (
           <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5">
-            
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm font-bold">
                 <button
@@ -589,7 +597,7 @@ export default function FateTravelTest() {
               {QUIZ_STEPS[quizIdx].options.map((opt, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleSelectOption(opt.tag)}
+                  onClick={() => handleSelectOption(opt)}
                   className="w-full p-4 text-left bg-[#FFF8E7] hover:bg-amber-200 text-stone-900 text-lg font-bold rounded-2xl border-[2.5px] border-stone-900 shadow-[4px_4px_0px_#1c1917] active:translate-x-[2px] active:translate-y-[2px] transition leading-snug"
                 >
                   {opt.text}
@@ -616,7 +624,6 @@ export default function FateTravelTest() {
         {step === 'result' && (
           <div className="space-y-4">
             <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5">
-              
               <div className="text-center space-y-1">
                 <span className="inline-block bg-amber-200 border-2 border-stone-900 px-3 py-0.5 rounded-full text-sm font-bold">
                   {birthYear}년 {birthMonth}월 {birthDay}일 ({saju.hourInfo.name}) × 성향 매칭
@@ -678,7 +685,6 @@ export default function FateTravelTest() {
                     : '숙소만 잡아두고 현지인이 붐비는 노천카페나 골목길에 발길 닿는 대로 들어가 보세요!'}
                 </div>
               </div>
-
             </div>
 
             <button
