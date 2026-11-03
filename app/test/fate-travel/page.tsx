@@ -33,7 +33,7 @@ const JIJI_HOURS = [
   { label: '태어난 시간 모름', name: '시간미상', element: 'NONE' }
 ];
 
-// 2. 스텝별로 넘어가는 7개의 상황극 질문 (각 질문마다 고유 일러스트 포함)
+// 2. 7개의 상황극 질문
 interface QuestionItem {
   stepTitle: string;
   question: string;
@@ -123,7 +123,7 @@ const QUIZ_STEPS: QuestionItem[] = [
   }
 ];
 
-// 3. 사주 오행(5) x 성향 조합(4) = 20개 세계 여행지 결과 DB
+// 3. 20개 세계 여행지 결과 DB
 interface TravelSpot {
   country: string;
   city: string;
@@ -346,7 +346,6 @@ function calculateSaju(year: number, month: number, day: number, hourIdx: number
 }
 
 export default function FateTravelTest() {
-  // 4단계 스텝: 'saju'(태어난시간 입력) -> 'quiz'(7문항 하나씩) -> 'loading'(분석중) -> 'result'(결과지)
   const [step, setStep] = useState<'saju' | 'quiz' | 'loading' | 'result'>('saju');
 
   // STEP 1: 사주 입력 상태
@@ -398,7 +397,6 @@ export default function FateTravelTest() {
 
     let targetElem = saju.dayMaster.element;
     if (isHeal) {
-      // 부족한 오행 보충 선택 시: 내 사주에서 가장 약한 오행 추출
       const sorted = Object.entries(saju.counts).sort((a, b) => a[1] - b[1]);
       targetElem = sorted[0][0];
     }
@@ -430,15 +428,8 @@ export default function FateTravelTest() {
     }
   };
 
-  const resetAll = () => {
-    setQuizIdx(0);
-    setAnswers([]);
-    setStep('saju');
-  };
-
   return (
     <main className="kkuk-theme min-h-screen bg-[#F5F0E6] py-8 px-4 flex justify-center items-start text-stone-900">
-      {/* 폰트 최우선 적용 스타일 */}
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
         @font-face {
@@ -456,7 +447,7 @@ export default function FateTravelTest() {
 
       <div className="w-full max-w-md">
         
-        {/* ==================== 1단계: 사주 생년월일시 입력 ==================== */}
+        {/* 1단계: 사주 입력 */}
         {step === 'saju' && (
           <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-6">
             
@@ -469,7 +460,6 @@ export default function FateTravelTest() {
               </h1>
             </div>
 
-            {/* 인트로 커스텀 일러스트 */}
             <div className="bg-[#E8F4F8] border-[2.5px] border-stone-900 rounded-2xl p-4 relative overflow-hidden">
               <svg viewBox="0 0 320 130" className="w-full h-32">
                 <circle cx="45" cy="30" r="16" fill="#fde047" stroke="#1c1917" strokeWidth="2.5" />
@@ -556,11 +546,10 @@ export default function FateTravelTest() {
           </div>
         )}
 
-        {/* ==================== 2단계: 하나씩 넘어가는 7문항 성향 퀴즈 ==================== */}
+        {/* 2단계: 7문항 성향 퀴즈 */}
         {step === 'quiz' && (
           <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5">
             
-            {/* 상단 진행률 바 & 뒤로가기 */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm font-bold">
                 <button
@@ -581,7 +570,6 @@ export default function FateTravelTest() {
               </div>
             </div>
 
-            {/* 질문별 상황극 일러스트 카드 */}
             <div
               className="border-[2.5px] border-stone-900 rounded-2xl p-5 text-center relative overflow-hidden shadow-[3px_3px_0px_#1c1917]"
               style={{ backgroundColor: QUIZ_STEPS[quizIdx].bg }}
@@ -593,12 +581,10 @@ export default function FateTravelTest() {
               <div className="text-xl tracking-widest">{QUIZ_STEPS[quizIdx].subEmojis}</div>
             </div>
 
-            {/* 질문 텍스트 */}
             <h2 className="text-2xl font-bold text-stone-900 leading-snug text-center px-1">
               Q{quizIdx + 1}. {QUIZ_STEPS[quizIdx].question}
             </h2>
 
-            {/* 선택지 버튼 2개 */}
             <div className="space-y-3 pt-1">
               {QUIZ_STEPS[quizIdx].options.map((opt, idx) => (
                 <button
@@ -613,7 +599,7 @@ export default function FateTravelTest() {
           </div>
         )}
 
-        {/* ==================== 3단계: 사주 × 성향 융합 분석 로딩 ==================== */}
+        {/* 3단계: 로딩 */}
         {step === 'loading' && (
           <div className="bg-[#FFFDF8] p-8 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] text-center py-20 space-y-4">
             <div className="text-6xl animate-bounce">✈️</div>
@@ -626,12 +612,11 @@ export default function FateTravelTest() {
           </div>
         )}
 
-        {/* ==================== 4단계: 최종 결과지 ==================== */}
+        {/* 4단계: 결과지 */}
         {step === 'result' && (
           <div className="space-y-4">
             <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5">
               
-              {/* 상단 티켓 헤더 */}
               <div className="text-center space-y-1">
                 <span className="inline-block bg-amber-200 border-2 border-stone-900 px-3 py-0.5 rounded-full text-sm font-bold">
                   {birthYear}년 {birthMonth}월 {birthDay}일 ({saju.hourInfo.name}) × 성향 매칭
@@ -644,7 +629,6 @@ export default function FateTravelTest() {
                 </div>
               </div>
 
-              {/* 여행지 맞춤 일러스트 포스터 */}
               <div className="border-[2.5px] border-stone-900 rounded-2xl overflow-hidden shadow-[3px_3px_0px_#1c1917]">
                 <svg viewBox="0 0 320 155" className="w-full h-40" style={{ backgroundColor: spot.illust.sky }}>
                   <circle cx="265" cy="35" r="20" fill="#fde047" stroke="#1c1917" strokeWidth="2.5" />
@@ -659,7 +643,6 @@ export default function FateTravelTest() {
                 </div>
               </div>
 
-              {/* 사주 + 성향 결합 상세 분석 */}
               <div className="bg-[#FFF8E7] p-4 rounded-2xl border-2 border-stone-900 space-y-2">
                 <div className="text-lg font-bold text-amber-950 border-b border-stone-300 pb-1">
                   🔮 사주({saju.dayMaster.kor}) × 내 성향 조합 풀이
@@ -670,7 +653,6 @@ export default function FateTravelTest() {
                   • <strong>추천 이유:</strong> {spot.whyMatch}
                 </p>
 
-                {/* 내 오행 분포 미니 바 */}
                 <div className="grid grid-cols-5 gap-1 pt-2 text-center text-xs font-bold">
                   <div className="bg-green-100 border border-stone-800 rounded-lg py-1">목(木)<br/>{saju.counts.WOOD}</div>
                   <div className="bg-red-100 border border-stone-800 rounded-lg py-1">화(火)<br/>{saju.counts.FIRE}</div>
@@ -680,7 +662,6 @@ export default function FateTravelTest() {
                 </div>
               </div>
 
-              {/* 어디를 가면 좋은지 추천 코스 */}
               <div className="bg-white p-4 rounded-2xl border-2 border-stone-900 space-y-2">
                 <div className="text-lg font-bold text-stone-900">
                   📍 이곳에 가면 꼭 해봐야 할 코스
@@ -702,4 +683,29 @@ export default function FateTravelTest() {
 
             <button
               onClick={handleShare}
-              className="w-full py-4 bg-[#FEE500] hover:bg-[#FDD800] text-stone-900
+              className="w-full py-4 bg-[#FEE500] hover:bg-[#FDD800] text-stone-900 text-lg font-bold rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917] active:translate-x-[2px] active:translate-y-[2px] transition"
+            >
+              {copied ? '✅ 링크 복사 완료! 단톡방에 붙여넣기' : '💬 친구들에게 내 사주 여행지 공유하기'}
+            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setStep('saju')}
+                className="py-3 bg-stone-800 text-white text-base rounded-xl border-2 border-stone-900"
+              >
+                🔄 처음부터 다시 하기
+              </button>
+              <Link
+                href="/"
+                className="py-3 bg-white text-stone-900 text-base text-center rounded-xl border-2 border-stone-900"
+              >
+                🏠 연구소 홈으로
+              </Link>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </main>
+  );
+}
