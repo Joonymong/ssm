@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: '오늘의 성향 연구소 | 1분 오피스 성향 진단',
-  description: '1분 만에 까발리는 오피스 생존 본능! 내 퇴사 타이머와 영수증을 확인해보세요.',
+  description: '1분 만에 까발리는 오피스 생존 본능과 사주 여행지 연구소',
   metadataBase: new URL('https://ssm-opal.vercel.app'),
   openGraph: {
     title: '오늘의 성향 연구소 💣',
-    description: '1분 만에 까발리는 오피스 생존 본능! 당신의 퇴사 시한폭탄 타이머는 며칠?',
+    description: '1분 만에 까발리는 오피스 생존 본능 & 사주×성향 세계 여행지 진단!',
     url: 'https://ssm-opal.vercel.app',
     siteName: '오늘의 성향 연구소',
     locale: 'ko_KR',
@@ -18,56 +18,44 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
-        {/* 1. 구글 애드센스 정식 심사 코드 */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7587381512055029"
           crossOrigin="anonymous"
         ></script>
-
-        {/* 2. Vercel Web Analytics 스크립트 (모듈 설치 없이 바로 방문자 집계) */}
         <script defer src="/_vercel/insights/script.js"></script>
-
-        {/* 3. Tailwind CSS CDN */}
         <script src="https://cdn.tailwindcss.com"></script>
 
-        {/* 4. 프리텐다드(Pretendard) 공식 가변 폰트 CDN */}
+        {/* 프리텐다드 & 손글씨 백업 웹폰트 로드 */}
         <link
           rel="stylesheet"
           as="style"
           crossOrigin="anonymous"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
         />
-
-        {/* 5. 레트로 만화 타이틀용 볼드 폰트 CDN */}
         <link
+           href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap"
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/MaplestoryOTFBold.woff2"
         />
 
-        {/* 6. 폰트 강제 적용 및 만화 도트 스타일 */}
         <style>{`
-          * {
-            font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif !important;
+          /* !important를 제거하여 하위 페이지에서 꾹꾹체가 정상 작동하도록 수정 */
+          body {
+            font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, sans-serif;
           }
 
+          /* 메모먼트 꾹꾹체 (public/kkuk.ttf 업로드 시 1순위 작동, 없을 시 손글씨체 즉시 작동) */
           @font-face {
-            font-family: 'ComicTitle';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/MaplestoryOTFBold.woff2') format('woff2');
-            font-weight: 700;
+            font-family: 'MemomentKkukkkuk';
+            src: url('/kkuk.ttf') format('truetype'),
+                 url('/kkuk.otf') format('opentype'),
+                 url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/MemomentKkukkkuk.woff2') format('woff2');
+            font-weight: normal;
             font-display: swap;
           }
 
-          .comic-font {
-            font-family: 'ComicTitle', cursive, sans-serif !important;
-          }
-
-          /* 만화책 망점 도트 배경 클래스 */
-          .comic-dots {
-            background-color: #f1f5f9;
-            background-image: radial-gradient(#cbd5e1 20%, transparent 20%);
-            background-position: 0 0;
-            background-size: 14px 14px;
+          .kkuk-theme, .kkuk-theme * {
+            font-family: 'MemomentKkukkkuk', 'Gaegu', cursive, sans-serif !important;
           }
         `}</style>
       </head>
