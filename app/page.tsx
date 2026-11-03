@@ -1,5 +1,13 @@
 import Link from 'next/link';
 const TEST_LIST = [
+    {
+    id: 'churu-game',
+    title: '사내 고양이 츄르주기 🐈',
+    desc: '근무 중에 몰래 사내 고양이에게 츄르를 주고 팀장님 눈치를 피하는 완벽한 월루 타이쿤 게임!',
+    emoji: '🐟',
+    tag: '신규',
+    accent: 'bg-amber-400 text-stone-900'
+  },
 {
     id: 'fate-travel',
     title: '사주 X 성향 운명 여행지 진단',
