@@ -15,32 +15,47 @@ export default function ChuruGame() {
   const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
   const [churuCount, setChuruCount] = useState(3); 
   const [money, setMoney] = useState(1500); 
-  const [log, setLog] = useState('사무실을 둘러보세요. 고양이가 나타날 때까지 대기해야 합니다!');
+  const [log, setLog] = useState('사무실을 둘러보세요. 벨이 울리면 일거리를 처리해 돈을 벌 수 있습니다!');
 
   const [kusariCount, setKusariCount] = useState(0);
-
   const [activeCatOnMap, setActiveCatOnMap] = useState<{ id: number; x: number; y: number } | null>(null);
+
+  // 🔔 책상별 긴급 업무 벨 상태 (어떤 책상에서 벨이 울리고 있는지)
+  const [activeBellDesk, setActiveBellDesk] = useState<number | null>(null);
 
   const [isFeeding, setIsFeeding] = useState(false);
   const [gauge, setGauge] = useState(0);
   const [gaugeDir, setGaugeDir] = useState(5);
   const [bossWarning, setBossWarning] = useState(false);
 
-  // ⏰ [고정 지출] 6초마다 300원 차감
+  // ⏰ [고정 지출] 7초마다 250원 차감 (초반 난이도 살짝 완화)
   useEffect(() => {
     if (gameState !== 'playing') return;
     const expenseInterval = setInterval(() => {
       setMoney(m => {
-        const nextMoney = m - 300;
+        const nextMoney = m - 250;
         if (nextMoney <= 0) setGameState('gameover');
         return nextMoney;
       });
-      setLog('💸 [고정 지출 발생] 커피값 및 점심 갹출비로 300원이 차감되었습니다.');
-    }, 6000);
+      setLog('💸 [고정 지출 발생] 커피값 및 점심 갹출비로 250원이 차감되었습니다.');
+    }, 7000);
     return () => clearInterval(expenseInterval);
   }, [gameState]);
 
-  // 🐈 [랜덤 고양이 스폰 시스템] 8~14초 간격으로 랜덤 등장
+  // 🔔 [긴급 일거리 벨 시스템] 랜덤 책상(0~3번)에서 5~9초마다 벨 울림
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    const bellInterval = setInterval(() => {
+      if (activeBellDesk === null) {
+        const randomDesk = Math.floor(Math.random() * 4); // 책상 4개 중 하나
+        setActiveBellDesk(randomDesk);
+        setLog('🔔 사내 책상 중 한 곳에서 급한 업무 벨이 울립니다! [처리하기]를 눌러 돈을 버세요!');
+      }
+    }, 7000);
+    return () => clearInterval(bellInterval);
+  }, [gameState, activeBellDesk]);
+
+  // 🐈 [랜덤 고양이 스폰 시스템] 10~15초 간격
   useEffect(() => {
     if (gameState !== 'playing') return;
     const spawnInterval = setInterval(() => {
@@ -53,9 +68,9 @@ export default function ChuruGame() {
           x: Math.floor(Math.random() * 70) + 15,
           y: Math.floor(Math.random() * 50) + 25,
         });
-        setLog(`👀 [제보] 사무실 책상 사이로 ${randomCat.name}가(이) 나타났습니다! 빨리 클릭하세요!`);
+        setLog(`👀 [제보] 책상 사이로 ${randomCat.name}가(이) 나타났습니다! (고양이를 누르거나 일을 하세요)`);
       }
-    }, 11000);
+    }, 12000);
     return () => clearInterval(spawnInterval);
   }, [gameState, activeCatOnMap, selectedCatId, cats]);
 
@@ -83,11 +98,11 @@ export default function ChuruGame() {
         setLog('🚨 경보: 팀장님이 급습했습니다! [일하는 척] 버튼을 눌러 위기를 모면하세요!');
         setTimeout(() => setBossWarning(false), 3500);
       }
-    }, 14000);
+    }, 15000);
     return () => clearInterval(bossInterval);
   }, [gameState]);
 
-  // 🏢 빈 공간(인사팀 책상 등) 클릭 시 쿠사리
+  // 🏢 빈 공간 클릭 시 쿠사리
   const handleOfficeClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.dataset.officeArea === 'true') {
@@ -107,9 +122,18 @@ export default function ChuruGame() {
     setLog(`✨ ${targetCat.name}를(을) 품에 안았습니다! 츄르를 짜주세요.`);
   };
 
+  // 💼 긴급 일거리 처리하고 100원 벌기
+  const handleResolveTask = (deskIdx: number) => {
+    if (activeBellDesk === deskIdx) {
+      setMoney(m => m + 100);
+      setActiveBellDesk(null);
+      setLog('📈 긴급 업무를 신속하게 처리하여 회사로부터 ₩100를 벌었습니다!');
+    }
+  };
+
   const startFeeding = () => {
     if (churuCount <= 0) {
-      alert('츄르가 다 떨어졌습니다! 월루해서 돈을 벌어 츄르를 사세요.');
+      alert('츄르가 다 떨어졌습니다! 일거리를 처리해 돈을 벌고 츄르를 사세요.');
       return;
     }
     setChuruCount(c => c - 1);
@@ -162,7 +186,7 @@ export default function ChuruGame() {
 
   const buyChuru = () => {
     if (money < 800) {
-      alert('잔고가 부족합니다! [일하는 척]을 눌러 돈을 버세요!');
+      alert('잔고가 부족합니다! 각 책상에서 울리는 [긴급 일거리]를 처리해 돈을 모으세요!');
       return;
     }
     setMoney(m => m - 800);
@@ -174,7 +198,6 @@ export default function ChuruGame() {
 
   return (
     <main className="min-h-screen bg-[#F5F0E6] py-8 px-4 flex justify-center text-stone-900">
-      {/* 프리텐다드 웹폰트 적용 */}
       <link
         rel="stylesheet"
         as="style"
@@ -193,18 +216,17 @@ export default function ChuruGame() {
         {gameState === 'intro' && (
           <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5 text-center">
             <span className="inline-block bg-amber-300 border-2 border-stone-900 px-3 py-0.5 rounded-full text-sm font-bold">
-              🏢 픽셀 오피스 월루 타이쿤
+              🏢 픽셀 오피스 월루 타이쿤 + 알바 생존
             </span>
             <h1 className="text-3xl font-bold leading-snug">
-              진짜 사무실 속 고양이 포획<br />& 지옥의 생존 게임
+              파산 위기 탈출!<br />긴급 일거리 처리 시스템
             </h1>
 
             <div className="bg-[#FFF8E7] p-4 rounded-2xl border-2 border-stone-900 text-left space-y-2 text-sm">
-              <p>📌 <strong>플레이 가이드:</strong></p>
-              <p>1. 사무실 책상들 사이로 고양이가 <strong>랜덤하게 불쑥</strong> 나타납니다.</p>
-              <p>2. 고양이를 정확히 클릭하면 츄르를 줄 수 있습니다.</p>
-              <p>3. <strong>주의!</strong> 엉뚱한 인사팀 책상이나 빈 공간을 누르면 고양이를 놓치고 상사에게 **쿠사리**를 먹습니다!</p>
-              <p>4. 츄르 타이밍 실패 시 상사 옷에 츄르 발사, 6초마다 지출로 인한 파산 주의!</p>
+              <p>📌 <strong>생존 가이드:</strong></p>
+              <p>1. 통장이 바닥나기 전에 책상에서 <strong>벨이 울리면 [처리하기]</strong>를 눌러 100원씩 벌 수 있습니다.</p>
+              <p>2. 고양이를 외면하고 열심히 일거리를 처리해 파산을 면하세요!</p>
+              <p>3. <strong>주의!</strong> 엉뚱한 빈 공간을 누르면 상사에게 **쿠사리(3회 누적 시 게임오버)**를 먹습니다.</p>
             </div>
 
             <button
@@ -255,32 +277,61 @@ export default function ChuruGame() {
                 </button>
               </div>
 
-              {/* 사무실 맵 */}
+              {/* 사무실 맵 (각 책상마다 벨이 울릴 수 있음) */}
               <div
                 data-office-area="true"
                 onClick={handleOfficeClick}
                 className="relative w-full h-72 bg-[#CBD5E1] border-[2.5px] border-stone-900 rounded-3xl overflow-hidden shadow-inner cursor-crosshair select-none"
               >
-                <div data-office-area="true" className="absolute top-6 left-6 w-24 h-14 bg-stone-400 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
-                  <span className="text-[10px]">👤 (개발자 뒷모습)</span>
-                  <div className="w-8 h-3 bg-stone-700 rounded-sm mt-1"></div>
+                {/* 책상 0: 개발자 */}
+                <div data-office-area="true" className="absolute top-6 left-6 w-24 h-16 bg-stone-400 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
+                  <span className="text-[10px]">👤 개발자 책상</span>
+                  {activeBellDesk === 0 ? (
+                    <button onClick={(e) => { e.stopPropagation(); handleResolveTask(0); }} className="mt-1 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded animate-bounce font-black">
+                      🔔 처리하기 (+100)
+                    </button>
+                  ) : (
+                    <div className="w-8 h-3 bg-stone-700 rounded-sm mt-1"></div>
+                  )}
                 </div>
 
-                <div data-office-area="true" className="absolute top-6 right-6 w-24 h-14 bg-stone-400 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
-                  <span className="text-[10px]">👤 (기획자 뒷모습)</span>
-                  <div className="w-8 h-3 bg-stone-700 rounded-sm mt-1"></div>
+                {/* 책상 1: 기획자 */}
+                <div data-office-area="true" className="absolute top-6 right-6 w-24 h-16 bg-stone-400 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
+                  <span className="text-[10px]">👤 기획자 책상</span>
+                  {activeBellDesk === 1 ? (
+                    <button onClick={(e) => { e.stopPropagation(); handleResolveTask(1); }} className="mt-1 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded animate-bounce font-black">
+                      🔔 처리하기 (+100)
+                    </button>
+                  ) : (
+                    <div className="w-8 h-3 bg-stone-700 rounded-sm mt-1"></div>
+                  )}
                 </div>
 
-                <div data-office-area="true" className="absolute bottom-6 left-6 w-24 h-14 bg-rose-200 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
-                  <span className="text-[10px] text-rose-900">🗂️ [인사팀 책상]</span>
-                  <div className="w-8 h-3 bg-rose-400 rounded-sm mt-1"></div>
+                {/* 책상 2: 인사팀 (페널티 구역) */}
+                <div data-office-area="true" className="absolute bottom-6 left-6 w-24 h-16 bg-rose-200 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
+                  <span className="text-[10px] text-rose-900">🗂️ 인사팀 책상</span>
+                  {activeBellDesk === 2 ? (
+                    <button onClick={(e) => { e.stopPropagation(); handleResolveTask(2); }} className="mt-1 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded animate-bounce font-black">
+                      🔔 처리하기 (+100)
+                    </button>
+                  ) : (
+                    <div className="w-8 h-3 bg-rose-400 rounded-sm mt-1"></div>
+                  )}
                 </div>
 
-                <div data-office-area="true" className="absolute bottom-6 right-6 w-24 h-14 bg-stone-400 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
-                  <span className="text-[10px]">👤 (마케터 뒷모습)</span>
-                  <div className="w-8 h-3 bg-stone-700 rounded-sm mt-1"></div>
+                {/* 책상 3: 마케터 */}
+                <div data-office-area="true" className="absolute bottom-6 right-6 w-24 h-16 bg-stone-400 border-2 border-stone-800 rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow">
+                  <span className="text-[10px]">👤 마케터 책상</span>
+                  {activeBellDesk === 3 ? (
+                    <button onClick={(e) => { e.stopPropagation(); handleResolveTask(3); }} className="mt-1 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded animate-bounce font-black">
+                      🔔 처리하기 (+100)
+                    </button>
+                  ) : (
+                    <div className="w-8 h-3 bg-stone-700 rounded-sm mt-1"></div>
+                  )}
                 </div>
 
+                {/* 랜덤 고양이 등장 */}
                 {activeCatOnMap && (
                   <div
                     onClick={(e) => {
@@ -297,10 +348,10 @@ export default function ChuruGame() {
                   </div>
                 )}
 
-                {!activeCatOnMap && !activeCat && (
+                {!activeCatOnMap && !activeCat && activeBellDesk === null && (
                   <div data-office-area="true" className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <span className="text-xs text-stone-600 font-bold bg-white/70 px-3 py-1 rounded-full border border-stone-400">
-                      평화로운 사무실... 고양이가 나타나길 기다리는 중 ☕
+                      사무실 대기 중... 고양이 또는 업무 벨을 기다리세요 ☕
                     </span>
                   </div>
                 )}
@@ -385,11 +436,11 @@ export default function ChuruGame() {
             <div className="text-6xl animate-bounce">🚨</div>
             <h2 className="text-3xl font-black text-rose-600">GAME OVER</h2>
             <p className="text-base text-stone-700 font-bold leading-relaxed">
-              인사팀 책상을 건드리거나 상사 옷에 츄르를 묻혀 <strong>쿠사리 3회</strong>를 누적했거나 통장이 파산했습니다! 회사에서 짐을 싸주세요 🏃‍♂️💨
+              통장이 파산하거나 상사에게 쿠사리를 3회 먹었습니다! 열심히 일거리를 처리했어야죠 🏃‍♂️💨
             </p>
 
             <button
-              onClick={() => { setGameState('intro'); setKusariCount(0); setMoney(1500); setChuruCount(3); setActiveCatOnMap(null); setSelectedCatId(null); }}
+              onClick={() => { setGameState('intro'); setKusariCount(0); setMoney(1500); setChuruCount(3); setActiveCatOnMap(null); setSelectedCatId(null); setActiveBellDesk(null); }}
               className="w-full py-4 bg-amber-400 hover:bg-amber-500 text-stone-900 text-lg font-bold rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917]"
             >
               🔄 정신 차리고 재입사하기
