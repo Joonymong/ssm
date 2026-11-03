@@ -3,18 +3,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-// 1. 명리학 10천간 (태어난 날의 기운)
+// 1. 명리학 10천간 데이터
 const CHEONGAN = [
-  { hanja: '甲', kor: '갑목(거목)', element: 'WOOD', desc: '곧게 뻗어나가는 추진력과 성장을 좋아하는 기운' },
-  { hanja: '乙', kor: '을목(들꽃)', element: 'WOOD', desc: '어디서든 유연하게 적응하고 낭만을 즐기는 기운' },
+  { hanja: '甲', kor: '갑목(큰 나무)', element: 'WOOD', desc: '곧게 뻗어나가는 추진력과 성장을 좋아하는 기운' },
+  { hanja: '乙', kor: '을목(들꽃·덩굴)', element: 'WOOD', desc: '어디서든 유연하게 적응하고 낭만을 즐기는 기운' },
   { hanja: '丙', kor: '병화(태양)', element: 'FIRE', desc: '화려하고 에너지가 넘치며 주목받길 좋아하는 기운' },
-  { hanja: '丁', kor: '정화(별빛)', element: 'FIRE', desc: '섬세한 감수성과 예술적 영감이 가득한 기운' },
-  { hanja: '戊', kor: '무토(큰산)', element: 'EARTH', desc: '듬직하고 스케일이 크며 웅장한 것을 선호하는 기운' },
-  { hanja: '己', kor: '기토(정원)', element: 'EARTH', desc: '다정하고 아늑하며 맛있는 것과 안정을 찾는 기운' },
-  { hanja: '庚', kor: '경금(바위)', element: 'METAL', desc: '결단력이 빠르고 세련된 문명과 액티비티를 즐기는 기운' },
+  { hanja: '丁', kor: '정화(별빛·촛불)', element: 'FIRE', desc: '섬세한 감수성과 예술적 영감이 가득한 기운' },
+  { hanja: '戊', kor: '무토(거대한 산)', element: 'EARTH', desc: '듬직하고 스케일이 크며 웅장한 풍경을 선호하는 기운' },
+  { hanja: '己', kor: '기토(비옥한 정원)', element: 'EARTH', desc: '다정하고 아늑하며 맛있는 미식과 안정을 찾는 기운' },
+  { hanja: '庚', kor: '경금(바위·원석)', element: 'METAL', desc: '결단력이 빠르고 세련된 문명과 액티비티를 즐기는 기운' },
   { hanja: '辛', kor: '신금(보석)', element: 'METAL', desc: '깔끔하고 안목이 높으며 남다른 감도를 추구하는 기운' },
-  { hanja: '壬', kor: '임수(대양)', element: 'WATER', desc: '자유분방하고 틀에 박힌 것을 싫어하는 넓은 바다의 기운' },
-  { hanja: '癸', kor: '계수(봄비)', element: 'WATER', desc: '차분하게 사색하고 감성적인 골목과 물가를 좋아하는 기운' }
+  { hanja: '壬', kor: '임수(넓은 바다)', element: 'WATER', desc: '자유분방하고 틀에 박힌 것을 싫어하는 대양의 기운' },
+  { hanja: '癸', kor: '계수(봄비·옹달샘)', element: 'WATER', desc: '차분하게 사색하고 감성적인 골목과 물가를 좋아하는 기운' }
 ];
 
 const JIJI_HOURS = [
@@ -33,7 +33,97 @@ const JIJI_HOURS = [
   { label: '태어난 시간 모름', name: '시간미상', element: 'NONE' }
 ];
 
-// 2. 사주 오행(5) x 성향 조합(4: 도시활기 / 도시낭만 / 자연모험 / 자연휴양) = 20개 맞춤 여행지
+// 2. 스텝별로 넘어가는 7개의 상황극 질문 (각 질문마다 고유 일러스트 포함)
+interface QuestionItem {
+  stepTitle: string;
+  question: string;
+  bg: string;
+  mainEmoji: string;
+  subEmojis: string;
+  options: { text: string; tag: string }[];
+}
+
+const QUIZ_STEPS: QuestionItem[] = [
+  {
+    stepTitle: 'STEP 1. 공항으로 떠나는 아침',
+    question: '드디어 기다리던 출국 날! 캐리어를 끌고 공항에 도착한 당신의 손에 들려 있는 것은?',
+    bg: '#E0F2FE',
+    mainEmoji: '🛫',
+    subEmojis: '🧳 🎫 ☕',
+    options: [
+      { text: '시간대별 동선과 맛집 구글맵 링크가 빽빽하게 정리된 계획표 📝', tag: 'PLAN_J' },
+      { text: '비행기 표와 여권, 그리고 첫날 잘 숙소 주소만 달랑 적힌 메모 🎒', tag: 'PLAN_P' }
+    ]
+  },
+  {
+    stepTitle: 'STEP 2. 비행기 창밖의 첫 풍경',
+    question: '구름을 뚫고 비행기가 착륙합니다! 창밖으로 어떤 풍경이 보일 때 심장이 더 두근거리나요?',
+    bg: '#FEF3C7',
+    mainEmoji: '🪟',
+    subEmojis: '☁️ ✨ 🌍',
+    options: [
+      { text: '화려한 랜드마크와 감각적인 편집샵, 낭만적인 골목이 얽힌 매력적인 도시 🏙️', tag: 'SCENE_CITY' },
+      { text: '인간의 손길이 닿지 않은 거대한 설산, 에메랄드빛 바다와 끝없는 숲 🏞️', tag: 'SCENE_NATURE' }
+    ]
+  },
+  {
+    stepTitle: 'STEP 3. 여행지에서의 첫 오전',
+    question: '숙소에서 눈을 뜬 첫날 아침! 오늘 하루를 어떤 템포로 채우고 싶나요?',
+    bg: '#DCFCE7',
+    mainEmoji: '☀️',
+    subEmojis: '👟 🕶️ 📷',
+    options: [
+      { text: '여기까지 왔는데 다 봐야지! 유명 스팟과 액티비티를 알차게 도장 깨기 🔥', tag: 'TEMPO_ACTIVE' },
+      { text: '알람 없이 푹 자고 일어나 뷰 좋은 카페나 해변에 누워 한량처럼 유유자적 🍵', tag: 'TEMPO_CHILL' }
+    ]
+  },
+  {
+    stepTitle: 'STEP 4. 예상치 못한 골목 갈림길',
+    question: '걷다가 우연히 지도에도 안 나오는 낯선 골목과 광장을 발견했습니다!',
+    bg: '#FCE7F3',
+    mainEmoji: '🧭',
+    subEmojis: '🏘️ 🐈 🎈',
+    options: [
+      { text: '현지인들이 줄 서 있는 시끌벅적한 시장과 화려한 중심가 쪽으로 직진! 🎪', tag: 'SCENE_CITY' },
+      { text: '사람 소리 대신 바람과 파도, 나무 냄새가 솔솔 나는 한적한 외곽 길로 산책 🌿', tag: 'SCENE_NATURE' }
+    ]
+  },
+  {
+    stepTitle: 'STEP 5. 황금 같은 저녁 시간',
+    question: '노을이 지고 어둠이 내려앉는 저녁, 당신이 가장 보내고 싶은 밤의 풍경은?',
+    bg: '#EDE9FE',
+    mainEmoji: '🌙',
+    subEmojis: '🍷 🎆 🕯️',
+    options: [
+      { text: '화려한 루프탑 바나 야시장, 뮤지컬 공연장에서 밤의 에너지를 만끽하기 🥂', tag: 'TEMPO_ACTIVE' },
+      { text: '모닥불이나 노천 온천, 조용한 테라스에서 별을 보며 맥주 한 캔 마시기 🌌', tag: 'TEMPO_CHILL' }
+    ]
+  },
+  {
+    stepTitle: 'STEP 6. 내 영혼이 원하는 사주 처방',
+    question: '이번 여행이 끝났을 때, 내 삶에 어떤 기운이 채워져서 돌아오길 바라나요?',
+    bg: '#FFEDD5',
+    mainEmoji: '🔮',
+    subEmojis: '⚡ 💧 🍀',
+    options: [
+      { text: '잠들어 있던 내 본성과 열정, 영감을 200% 폭발시켜 줄 강렬한 자극! ⚡', tag: 'STYLE_BOOST' },
+      { text: '현생에 지치고 닳아버린 멘탈을 부드럽게 감싸 안아줄 빈틈없는 위로와 보충 💧', tag: 'STYLE_HEAL' }
+    ]
+  },
+  {
+    stepTitle: 'STEP 7. 마지막 날의 기념품',
+    question: '한국으로 돌아가는 비행기 타기 직전, 내가 마지막까지 포기 못 하는 것은?',
+    bg: '#F1F5F9',
+    mainEmoji: '🎁',
+    subEmojis: '🛍️ 📮 🎞️',
+    options: [
+      { text: '이 도시에서만 살 수 있는 트렌디한 아이템과 감도 높은 맛집 투어 완수 🛍️', tag: 'SCENE_CITY' },
+      { text: '카메라에도 다 안 담기는 대자연의 풍경을 눈과 마음에 끝까지 담아두기 🏔️', tag: 'SCENE_NATURE' }
+    ]
+  }
+];
+
+// 3. 사주 오행(5) x 성향 조합(4) = 20개 세계 여행지 결과 DB
 interface TravelSpot {
   country: string;
   city: string;
@@ -45,7 +135,6 @@ interface TravelSpot {
 }
 
 const TRAVEL_DB: Record<string, TravelSpot> = {
-  // [목(WOOD) 기운 매칭]
   WOOD_CITY_ACTIVE: {
     country: '호주 (Australia)',
     city: '시드니 & 본다이 비치',
@@ -82,8 +171,6 @@ const TRAVEL_DB: Record<string, TravelSpot> = {
     mustGo: ['메캄퐁 고산 숲속 마을 카페에서 멍때리기', '반캉왓 예술가 마을 공방 구경', '숲속 아로마 마사지 & 나이트마켓'],
     illust: { bg: '#ecfccb', sky: '#fde68a', landmark: '🐘', icons: ['🌳', '☕', '🏮'], caption: '초록빛 그늘 아래 느리게 흐르는 치앙마이' }
   },
-
-  // [화(FIRE) 기운 매칭]
   FIRE_CITY_ACTIVE: {
     country: '스페인 (Spain)',
     city: '바르셀로나 (Barcelona)',
@@ -120,8 +207,6 @@ const TRAVEL_DB: Record<string, TravelSpot> = {
     mustGo: ['사하라 사막 럭셔리 글램핑 & 별구경', '마조렐 정원의 이국적인 코발트블루 산책', '루프탑 테라스에서 민트티 마시며 노을 보기'],
     illust: { bg: '#fdba74', sky: '#312e81', landmark: '🐪', icons: ['🌙', '✨', '⛺'], caption: '붉은 사막 위로 별빛이 쏟아지는 사하라의 밤' }
   },
-
-  // [토(EARTH) 기운 매칭]
   EARTH_CITY_ACTIVE: {
     country: '이탈리아 (Italy)',
     city: '로마 (Rome) 고대 제국 투어',
@@ -137,7 +222,7 @@ const TRAVEL_DB: Record<string, TravelSpot> = {
     flight: '한국에서 직항 약 11시간 30분',
     vibeTitle: '단단한 토(土) 기운 × 동화 속 중세 낭만파',
     whyMatch: '안정감 있는 흙과 돌(土)의 사주에 여유로운 도시 감성이 결합되었습니다. 주황색 지붕이 끝없이 펼쳐진 프라하 성벽 아래서 코젤 흑맥주를 마시며 까를교의 노을을 바라보는 시간이 최고의 보약입니다.',
-    mustGo: ['까를교 새벽 물안개 & 황혼 산책', '프라하 성 스타벅스 전망대에서 지붕 구경', '체스키크룸로프 성곽 마을 1박 2일 유랑'],
+    mustGo: ['까를교 새벽 물안개 & 황혼 산책', '프라하 성 전망대에서 붉은 지붕 구경', '체스키크룸로프 성곽 마을 1박 2일 유랑'],
     illust: { bg: '#fed7aa', sky: '#e9d5ff', landmark: '🏰', icons: ['🍺', '🎻', '🦢'], caption: '붉은 지붕과 중세의 시간이 멈춘 프라하' }
   },
   EARTH_NATURE_ACTIVE: {
@@ -152,14 +237,12 @@ const TRAVEL_DB: Record<string, TravelSpot> = {
   EARTH_NATURE_CHILL: {
     country: '이탈리아 (Italy)',
     city: '토스카나 시골 와이너리 평원',
-    flight: '한국에서 로마 직항 약 13시간 (+렌터카/기차 2시간)',
+    flight: '한국에서 로마 직항 약 13시간 (+기차 2시간)',
     vibeTitle: '비옥한 정원 토(土) 기운 × 미식·전원 힐링파',
-    whyMatch: '따뜻하고 포용력 넓은 비옥한 땅(己土)의 사주에 평화로운 안식을 추구하는 성향입니다. 초록빛 구릉지 위에 세워진 고성 농장(아그리투리스모)에 머물며 갓 짜낸 올리브유와 와인을 즐기세요.',
+    whyMatch: '따뜻하고 포용력 넓은 비옥한 땅(己土)의 사주에 평화로운 안식을 추구하는 성향입니다. 초록빛 구릉지 위에 세워진 고성 농장에 머물며 갓 짜낸 올리브유와 와인을 즐기세요.',
     mustGo: ['발도르차 사이프러스 나무 언덕길 산책', '몬탈치노 고성 와이너리 브루넬로 시음', '시골 농장 숙소 수영장에서 낮잠'],
     illust: { bg: '#d9f99d', sky: '#fef9c3', landmark: '🏡', icons: ['🍷', '🫒', '🌻'], caption: '황금빛 햇살과 포도밭이 넘실대는 토스카나' }
   },
-
-  // [금(METAL) 기운 매칭]
   METAL_CITY_ACTIVE: {
     country: '미국 (USA)',
     city: '뉴욕 맨해튼 (New York)',
@@ -184,7 +267,7 @@ const TRAVEL_DB: Record<string, TravelSpot> = {
     flight: '한국에서 캘거리 경유 약 12시간',
     vibeTitle: '강인한 바위 경금(庚金) 기운 × 설산 탐험가',
     whyMatch: '거대한 바위산(金)의 기운과 액티브한 자연파 성향이 결합되었습니다. 깎아지른 듯한 로키산맥의 바위 봉우리들과 레이크 루이스에서 카누를 저으며 대자연의 청량한 공기를 들이마실 때 가슴이 뻥 뚫립니다.',
-    mustGo: ['레이크 루이스 에메랄드 호수 카누 타기', '콜롬비아 대빙원 설상차(아이스 익스플로러)', '밴프 설퍼산 곤돌라 & 야외 온천'],
+    mustGo: ['레이크 루이스 에메랄드 호수 카누 타기', '콜롬비아 대빙원 설상차 투어', '밴프 설퍼산 곤돌라 & 야외 온천'],
     illust: { bg: '#cbd5e1', sky: '#bae6fd', landmark: '🏔️', icons: ['🛶', '🦌', '🌲'], caption: '거대한 바위산과 빙하 호수가 빛나는 로키산맥' }
   },
   METAL_NATURE_CHILL: {
@@ -196,8 +279,6 @@ const TRAVEL_DB: Record<string, TravelSpot> = {
     mustGo: ['고르너그라트 산악열차 타고 마테호른 감상', '알프스 뷰 인피니티 온천 스파', '통나무 산장 테라스에서 퐁듀와 화이트와인'],
     illust: { bg: '#f8fafc', sky: '#7dd3fc', landmark: '🚂', icons: ['🏔️', '🧀', '🥂'], caption: '만년설 봉우리를 기차 타고 누비는 스위스 알프스' }
   },
-
-  // [수(WATER) 기운 매칭]
   WATER_CITY_ACTIVE: {
     country: '싱가포르 & 홍콩',
     city: '마리나베이 & 빅토리아 하버',
@@ -265,49 +346,79 @@ function calculateSaju(year: number, month: number, day: number, hourIdx: number
 }
 
 export default function FateTravelTest() {
-  const [step, setStep] = useState<'input' | 'result'>('input');
+  // 4단계 스텝: 'saju'(태어난시간 입력) -> 'quiz'(7문항 하나씩) -> 'loading'(분석중) -> 'result'(결과지)
+  const [step, setStep] = useState<'saju' | 'quiz' | 'loading' | 'result'>('saju');
 
-  // 1. 사주 입력 상태
+  // STEP 1: 사주 입력 상태
   const [birthYear, setBirthYear] = useState(1995);
   const [birthMonth, setBirthMonth] = useState(5);
   const [birthDay, setBirthDay] = useState(15);
   const [hourIdx, setHourIdx] = useState(6);
 
-  // 2. 성향 밸런스 4대 축 (이 조합에 따라 결과가 완전히 달라짐)
-  const [prefScene, setPrefScene] = useState<'CITY' | 'NATURE'>('CITY');       // 도시문명 vs 대자연
-  const [prefTempo, setPrefTempo] = useState<'ACTIVE' | 'CHILL'>('ACTIVE');    // 알찬모험 vs 느긋휴양
-  const [prefStyle, setPrefStyle] = useState<'BOOST' | 'HEAL'>('BOOST');       // 내 본성 기운 극대화 vs 지친 멘탈 보충(용신)
-  const [prefPlan, setPrefPlan] = useState<'J' | 'P'>('P');                    // 꼼꼼계획 vs 즉흥낭만
-
+  // STEP 2: 퀴즈 진행 상태 및 성향 점수 누적
+  const [quizIdx, setQuizIdx] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
 
   const saju = calculateSaju(birthYear, birthMonth, birthDay, hourIdx);
 
-  // 사주 오행 + 성향 4축을 결합해 최종 여행지 키 산출
-  const getCombinedKey = () => {
-    let targetElem = saju.dayMaster.element;
+  // 질문 선택 시 다음 스텝으로 이동
+  const handleSelectOption = (tag: string) => {
+    const nextAnswers = [...answers, tag];
+    setAnswers(nextAnswers);
 
-    if (prefStyle === 'HEAL') {
-      // '지친 멘탈 보충' 선택 시: 내 사주에서 가장 부족한 오행 + 내 성향(J/P)이 원하는 기운을 결합
-      const sorted = Object.entries(saju.counts).sort((a, b) => a[1] - b[1]);
-      targetElem = sorted[0][0];
+    if (quizIdx + 1 < QUIZ_STEPS.length) {
+      setQuizIdx(quizIdx + 1);
     } else {
-      // '내 잠재력 폭발' 선택 시: 일간 기운과 태어난 계절 기운 중 성향과 맞는 쪽 선택
-      if (prefPlan === 'J' && saju.monthElement !== saju.dayMaster.element) {
-        targetElem = saju.dayMaster.element;
-      }
+      setStep('loading');
+      setTimeout(() => {
+        setStep('result');
+      }, 2200);
     }
-
-    return `${targetElem}_${prefScene}_${prefTempo}`;
   };
 
-  const resultKey = getCombinedKey();
-  const spot = TRAVEL_DB[resultKey] || TRAVEL_DB.WOOD_NATURE_CHILL;
+  // 이전 질문으로 되돌아가기
+  const handlePrevQuestion = () => {
+    if (quizIdx > 0) {
+      setQuizIdx(quizIdx - 1);
+      setAnswers(answers.slice(0, -1));
+    } else {
+      setStep('saju');
+    }
+  };
+
+  // 사주 오행 + 7문항 성향 응답을 합산해 최종 여행지 결정
+  const getFinalDestination = () => {
+    const countTag = (t: string) => answers.filter((a) => a === t).length;
+
+    const isCity = countTag('SCENE_CITY') >= countTag('SCENE_NATURE');
+    const isActive = countTag('TEMPO_ACTIVE') >= countTag('TEMPO_CHILL');
+    const isHeal = countTag('STYLE_HEAL') > 0;
+    const isPlanJ = countTag('PLAN_J') > 0;
+
+    let targetElem = saju.dayMaster.element;
+    if (isHeal) {
+      // 부족한 오행 보충 선택 시: 내 사주에서 가장 약한 오행 추출
+      const sorted = Object.entries(saju.counts).sort((a, b) => a[1] - b[1]);
+      targetElem = sorted[0][0];
+    }
+
+    const key = `${targetElem}_${isCity ? 'CITY' : 'NATURE'}_${isActive ? 'ACTIVE' : 'CHILL'}`;
+    return {
+      spot: TRAVEL_DB[key] || TRAVEL_DB.WOOD_NATURE_CHILL,
+      isPlanJ,
+      isHeal,
+      isCity,
+      isActive
+    };
+  };
+
+  const { spot, isPlanJ, isHeal } = getFinalDestination();
 
   const handleShare = async () => {
     const shareData = {
       title: '사주 × 성향 운명의 세계 여행지 ✈️',
-      text: `[${birthYear}.${birthMonth}.${birthDay}생] 내 사주(${saju.dayMaster.kor})와 여행 성향을 합친 운명 여행지는 👉 ${spot.country} ${spot.city}! (${spot.flight})`,
+      text: `[${birthYear}.${birthMonth}.${birthDay}생] 내 사주(${saju.dayMaster.kor})와 여행 성향을 조합한 운명 여행지는 👉 ${spot.country} ${spot.city}! (${spot.flight})`,
       url: window.location.href,
     };
     if (navigator.share) {
@@ -319,60 +430,81 @@ export default function FateTravelTest() {
     }
   };
 
+  const resetAll = () => {
+    setQuizIdx(0);
+    setAnswers([]);
+    setStep('saju');
+  };
+
   return (
-    <main className="kkuk-theme min-h-screen bg-[#F5F0E6] py-8 px-4 flex justify-center text-stone-900">
+    <main className="kkuk-theme min-h-screen bg-[#F5F0E6] py-8 px-4 flex justify-center items-start text-stone-900">
+      {/* 폰트 최우선 적용 스타일 */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
+        @font-face {
+          font-family: 'MemomentKkukkkuk';
+          src: url('/kkuk.ttf') format('truetype'),
+               url('/kkuk.otf') format('opentype'),
+               url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/MemomentKkukkkuk.woff2') format('woff2');
+          font-weight: normal;
+          font-display: swap;
+        }
+        .kkuk-theme, .kkuk-theme * {
+          font-family: 'MemomentKkukkkuk', 'Gaegu', cursive, sans-serif !important;
+        }
+      `}} />
+
       <div className="w-full max-w-md">
         
-        {step === 'input' && (
+        {/* ==================== 1단계: 사주 생년월일시 입력 ==================== */}
+        {step === 'saju' && (
           <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-6">
             
-            {/* 타이틀 영역 */}
             <div className="text-center space-y-1.5">
               <span className="inline-block bg-amber-300 border-2 border-stone-900 px-3 py-0.5 rounded-full text-sm font-bold">
-                🧭 생년월일시 사주 × 나의 여행 성향
+                🧭 1단계: 나의 타고난 사주 입력
               </span>
               <h1 className="text-3xl font-bold leading-snug pt-1">
-                사주와 성향으로 조합하는<br />운명의 세계 여행지
+                태어난 시간 × 내 성향<br />운명의 세계 여행지 찾기
               </h1>
             </div>
 
-            {/* 손그림 느낌 일러스트 박스 */}
+            {/* 인트로 커스텀 일러스트 */}
             <div className="bg-[#E8F4F8] border-[2.5px] border-stone-900 rounded-2xl p-4 relative overflow-hidden">
-              <svg viewBox="0 0 320 125" className="w-full h-32">
+              <svg viewBox="0 0 320 130" className="w-full h-32">
                 <circle cx="45" cy="30" r="16" fill="#fde047" stroke="#1c1917" strokeWidth="2.5" />
-                <path d="M0 105 Q80 85 160 105 T320 100 L320 125 L0 125 Z" fill="#fef08a" stroke="#1c1917" strokeWidth="2.5" />
-                <text x="20" y="100" fontSize="32">🗼</text>
-                <text x="70" y="102" fontSize="28">🗽</text>
-                <text x="215" y="102" fontSize="30">🏔️</text>
-                <text x="265" y="102" fontSize="30">🏝️</text>
-                <g>
-                  <rect x="120" y="55" width="75" height="44" rx="10" fill="#f97316" stroke="#1c1917" strokeWidth="2.5" />
-                  <text x="135" y="50" fontSize="38">🧳</text>
-                  <text x="172" y="45" fontSize="24">✈️</text>
+                <path d="M0 108 Q80 85 160 108 T320 100 L320 130 L0 130 Z" fill="#fef08a" stroke="#1c1917" strokeWidth="2.5" />
+                <text x="20" y="102" fontSize="34">🗼</text>
+                <text x="72" y="104" fontSize="30">🗽</text>
+                <text x="215" y="104" fontSize="32">🏔️</text>
+                <text x="265" y="104" fontSize="32">🏝️</text>
+                <g className="animate-bounce">
+                  <rect x="120" y="58" width="75" height="44" rx="10" fill="#f97316" stroke="#1c1917" strokeWidth="2.5" />
+                  <text x="135" y="52" fontSize="38">🧳</text>
+                  <text x="172" y="48" fontSize="24">✈️</text>
                 </g>
               </svg>
               <p className="text-center text-sm text-stone-700 mt-1 font-bold">
-                태어난 시간(사주)과 아래 성향 스위치 4개를 조합해 보세요!
+                먼저 생년월일시를 입력한 뒤, 7가지 여행 성향 질문으로 넘어갑니다!
               </p>
             </div>
 
-            {/* STEP 1: 태어난 날짜와 시간 */}
-            <div className="bg-[#FFF8E7] p-4 rounded-2xl border-2 border-stone-900 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold">① 태어난 날짜와 시간</span>
+            <div className="bg-[#FFF8E7] p-4 rounded-2xl border-2 border-stone-900 space-y-3.5">
+              <div className="flex items-center justify-between border-b border-stone-300 pb-2">
+                <span className="text-lg font-bold">📜 생년월일시 (양력)</span>
                 <span className="text-xs bg-amber-200 border border-stone-900 px-2.5 py-0.5 rounded-full font-bold">
-                  내 일주: {saju.dayMaster.hanja}({saju.dayMaster.kor})
+                  내 일간: {saju.dayMaster.hanja}({saju.dayMaster.kor})
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="text-xs text-stone-600 block mb-1">연도(년)</label>
+                  <label className="text-xs text-stone-600 block mb-1">출생 연도</label>
                   <input
                     type="number"
                     value={birthYear}
                     onChange={(e) => setBirthYear(Number(e.target.value))}
-                    className="w-full p-2 bg-white border-2 border-stone-900 rounded-xl text-center text-lg font-bold"
+                    className="w-full p-2.5 bg-white border-2 border-stone-900 rounded-xl text-center text-lg font-bold"
                   />
                 </div>
                 <div>
@@ -380,7 +512,7 @@ export default function FateTravelTest() {
                   <select
                     value={birthMonth}
                     onChange={(e) => setBirthMonth(Number(e.target.value))}
-                    className="w-full p-2 bg-white border-2 border-stone-900 rounded-xl text-center text-lg font-bold"
+                    className="w-full p-2.5 bg-white border-2 border-stone-900 rounded-xl text-center text-lg font-bold"
                   >
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                       <option key={m} value={m}>{m}월</option>
@@ -392,7 +524,7 @@ export default function FateTravelTest() {
                   <select
                     value={birthDay}
                     onChange={(e) => setBirthDay(Number(e.target.value))}
-                    className="w-full p-2 bg-white border-2 border-stone-900 rounded-xl text-center text-lg font-bold"
+                    className="w-full p-2.5 bg-white border-2 border-stone-900 rounded-xl text-center text-lg font-bold"
                   >
                     {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
                       <option key={d} value={d}>{d}일</option>
@@ -415,126 +547,91 @@ export default function FateTravelTest() {
               </div>
             </div>
 
-            {/* STEP 2: 나의 평소 성향 4가지 조합 */}
-            <div className="bg-[#FFF8E7] p-4 rounded-2xl border-2 border-stone-900 space-y-3.5">
-              <div className="text-lg font-bold">② 나의 여행 성향 밸런스 (직접 선택)</div>
-
-              {/* 성향 1: 풍경 취향 */}
-              <div className="space-y-1">
-                <span className="text-xs text-stone-600 block">Q1. 비행기 내렸을 때 더 설레는 풍경은?</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPrefScene('CITY')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefScene === 'CITY' ? 'bg-amber-300 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    🏙️ 매력적인 도시·골목
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPrefScene('NATURE')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefScene === 'NATURE' ? 'bg-amber-300 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    🏞️ 압도적인 대자연·바다
-                  </button>
-                </div>
-              </div>
-
-              {/* 성향 2: 여행 템포 */}
-              <div className="space-y-1">
-                <span className="text-xs text-stone-600 block">Q2. 내가 추구하는 여행 에너지 템포는?</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPrefTempo('ACTIVE')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefTempo === 'ACTIVE' ? 'bg-rose-200 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    🔥 핫플·액티비티 정복
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPrefTempo('CHILL')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefTempo === 'CHILL' ? 'bg-rose-200 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    🍵 느긋한 산책·칠링 휴식
-                  </button>
-                </div>
-              </div>
-
-              {/* 성향 3: 현재 필요한 사주 처방 */}
-              <div className="space-y-1">
-                <span className="text-xs text-stone-600 block">Q3. 지금 나에게 더 필요한 여행의 목적은?</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPrefStyle('BOOST')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefStyle === 'BOOST' ? 'bg-emerald-200 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    ⚡ 내 타고난 기운 극대화
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPrefStyle('HEAL')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefStyle === 'HEAL' ? 'bg-emerald-200 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    💧 부족한 기운 채워 힐링
-                  </button>
-                </div>
-              </div>
-
-              {/* 성향 4: 계획성 */}
-              <div className="space-y-1">
-                <span className="text-xs text-stone-600 block">Q4. 평소 나의 일정 소화 스타일은?</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPrefPlan('J')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefPlan === 'J' ? 'bg-sky-200 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    📝 동선·예약 완벽 준비파
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPrefPlan('P')}
-                    className={`p-2.5 rounded-xl border-2 border-stone-900 text-base transition ${
-                      prefPlan === 'P' ? 'bg-sky-200 shadow-[2px_2px_0px_#1c1917] font-bold' : 'bg-white text-stone-500'
-                    }`}
-                  >
-                    🎒 발길 닿는 대로 즉흥파
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <button
-              onClick={() => setStep('result')}
+              onClick={() => { setQuizIdx(0); setAnswers([]); setStep('quiz'); }}
               className="w-full py-4 bg-amber-300 hover:bg-amber-400 text-stone-900 text-xl font-bold rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917] active:translate-x-[2px] active:translate-y-[2px] transition"
             >
-              사주 × 성향 조합 결과 보기 ✈️
+              다음: 여행 성향 질문 시작하기 (1/7) ➔
             </button>
           </div>
         )}
 
-        {/* 결과 리포트 화면 */}
+        {/* ==================== 2단계: 하나씩 넘어가는 7문항 성향 퀴즈 ==================== */}
+        {step === 'quiz' && (
+          <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5">
+            
+            {/* 상단 진행률 바 & 뒤로가기 */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm font-bold">
+                <button
+                  onClick={handlePrevQuestion}
+                  className="text-stone-500 hover:text-stone-900 underline"
+                >
+                  ← 이전으로
+                </button>
+                <span className="bg-amber-200 border border-stone-900 px-3 py-0.5 rounded-full">
+                  질문 {quizIdx + 1} / {QUIZ_STEPS.length}
+                </span>
+              </div>
+              <div className="w-full h-3 bg-stone-200 rounded-full border-2 border-stone-900 overflow-hidden">
+                <div
+                  className="h-full bg-amber-400 transition-all duration-300"
+                  style={{ width: `${((quizIdx + 1) / QUIZ_STEPS.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* 질문별 상황극 일러스트 카드 */}
+            <div
+              className="border-[2.5px] border-stone-900 rounded-2xl p-5 text-center relative overflow-hidden shadow-[3px_3px_0px_#1c1917]"
+              style={{ backgroundColor: QUIZ_STEPS[quizIdx].bg }}
+            >
+              <span className="inline-block bg-white/90 border border-stone-900 px-3 py-0.5 rounded-full text-xs font-bold mb-2">
+                {QUIZ_STEPS[quizIdx].stepTitle}
+              </span>
+              <div className="text-6xl my-2 animate-bounce">{QUIZ_STEPS[quizIdx].mainEmoji}</div>
+              <div className="text-xl tracking-widest">{QUIZ_STEPS[quizIdx].subEmojis}</div>
+            </div>
+
+            {/* 질문 텍스트 */}
+            <h2 className="text-2xl font-bold text-stone-900 leading-snug text-center px-1">
+              Q{quizIdx + 1}. {QUIZ_STEPS[quizIdx].question}
+            </h2>
+
+            {/* 선택지 버튼 2개 */}
+            <div className="space-y-3 pt-1">
+              {QUIZ_STEPS[quizIdx].options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectOption(opt.tag)}
+                  className="w-full p-4 text-left bg-[#FFF8E7] hover:bg-amber-200 text-stone-900 text-lg font-bold rounded-2xl border-[2.5px] border-stone-900 shadow-[4px_4px_0px_#1c1917] active:translate-x-[2px] active:translate-y-[2px] transition leading-snug"
+                >
+                  {opt.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ==================== 3단계: 사주 × 성향 융합 분석 로딩 ==================== */}
+        {step === 'loading' && (
+          <div className="bg-[#FFFDF8] p-8 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] text-center py-20 space-y-4">
+            <div className="text-6xl animate-bounce">✈️</div>
+            <h3 className="text-2xl font-bold text-stone-900">
+              {birthYear}년생 ({saju.dayMaster.kor}) 사주와<br />7가지 여행 성향 조합 중...
+            </h3>
+            <p className="text-base text-stone-600">
+              전 세계 도시 중 당신의 주파수와 딱 맞는 곳을 찾고 있습니다 🌍
+            </p>
+          </div>
+        )}
+
+        {/* ==================== 4단계: 최종 결과지 ==================== */}
         {step === 'result' && (
           <div className="space-y-4">
             <div className="bg-[#FFFDF8] p-6 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-5">
               
-              {/* 상단 헤더 */}
+              {/* 상단 티켓 헤더 */}
               <div className="text-center space-y-1">
                 <span className="inline-block bg-amber-200 border-2 border-stone-900 px-3 py-0.5 rounded-full text-sm font-bold">
                   {birthYear}년 {birthMonth}월 {birthDay}일 ({saju.hourInfo.name}) × 성향 매칭
@@ -568,9 +665,19 @@ export default function FateTravelTest() {
                   🔮 사주({saju.dayMaster.kor}) × 내 성향 조합 풀이
                 </div>
                 <p className="text-base text-stone-800 leading-relaxed">
-                  • <strong>타고난 사주 본성:</strong> {saju.dayMaster.desc}<br />
-                  • <strong>성향 결합 결론:</strong> {spot.whyMatch}
+                  • <strong>타고난 사주 기운:</strong> {saju.dayMaster.desc}<br />
+                  • <strong>사주 처방 방식:</strong> {isHeal ? '내 사주에 부족했던 오행 기운을 다정하게 채워주는 치유형 여행지입니다.' : '내 사주가 가진 타고난 본성과 잠재력을 200% 끌어올리는 시너지 여행지입니다.'}<br />
+                  • <strong>추천 이유:</strong> {spot.whyMatch}
                 </p>
+
+                {/* 내 오행 분포 미니 바 */}
+                <div className="grid grid-cols-5 gap-1 pt-2 text-center text-xs font-bold">
+                  <div className="bg-green-100 border border-stone-800 rounded-lg py-1">목(木)<br/>{saju.counts.WOOD}</div>
+                  <div className="bg-red-100 border border-stone-800 rounded-lg py-1">화(火)<br/>{saju.counts.FIRE}</div>
+                  <div className="bg-amber-100 border border-stone-800 rounded-lg py-1">토(土)<br/>{saju.counts.EARTH}</div>
+                  <div className="bg-slate-200 border border-stone-800 rounded-lg py-1">금(金)<br/>{saju.counts.METAL}</div>
+                  <div className="bg-sky-100 border border-stone-800 rounded-lg py-1">수(水)<br/>{saju.counts.WATER}</div>
+                </div>
               </div>
 
               {/* 어디를 가면 좋은지 추천 코스 */}
@@ -584,8 +691,8 @@ export default function FateTravelTest() {
                   ))}
                 </ul>
                 <div className="pt-2 mt-2 border-t border-dashed border-stone-300 text-sm text-stone-600">
-                  💡 <strong>{prefPlan === 'J' ? '계획파(J) 맞춤 팁' : '즉흥파(P) 맞춤 팁'}:</strong>{' '}
-                  {prefPlan === 'J'
+                  💡 <strong>{isPlanJ ? '계획파(J) 맞춤 팁' : '즉흥파(P) 맞춤 팁'}:</strong>{' '}
+                  {isPlanJ
                     ? '인기 전망대와 근교 투어는 한국에서 미리 패스를 예매해 가면 동선 스트레스가 0이 됩니다!'
                     : '숙소만 잡아두고 현지인이 붐비는 노천카페나 골목길에 발길 닿는 대로 들어가 보세요!'}
                 </div>
@@ -595,29 +702,4 @@ export default function FateTravelTest() {
 
             <button
               onClick={handleShare}
-              className="w-full py-4 bg-[#FEE500] hover:bg-[#FDD800] text-stone-900 text-lg font-bold rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917] active:translate-x-[2px] active:translate-y-[2px] transition"
-            >
-              {copied ? '✅ 링크 복사 완료! 단톡방에 붙여넣기' : '💬 친구들에게 내 사주 여행지 공유하기'}
-            </button>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setStep('input')}
-                className="py-3 bg-stone-800 text-white text-base rounded-xl border-2 border-stone-900"
-              >
-                🔄 성향 바꿔서 다른 조합 보기
-              </button>
-              <Link
-                href="/"
-                className="py-3 bg-white text-stone-900 text-base text-center rounded-xl border-2 border-stone-900"
-              >
-                🏠 연구소 홈으로
-              </Link>
-            </div>
-          </div>
-        )}
-
-      </div>
-    </main>
-  );
-}
+              className="w-full py-4 bg-[#FEE500] hover:bg-[#FDD800] text-stone-900
