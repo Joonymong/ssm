@@ -10,40 +10,34 @@ export default function ChuruGame() {
     { id: 3, name: '이사님', emoji: '🦁', title: '사옥 최고 뚱냥이', affection: 0, maxAffection: 500, unlocked: false, desc: '법인카드로 츄르를 쓸어담는 거대 뚱냥이.' }
   ]);
   
-  const [selectedCatId, setSelectedCatId] = useState<number | null>(null); // 클릭해서 잡은 고양이
+  const [selectedCatId, setSelectedCatId] = useState<number | null>(null);
   const [churuCount, setChuruCount] = useState(10); 
   const [money, setMoney] = useState(5000); 
   const [log, setLog] = useState('사내 오피스를 돌아다니는 고양이를 클릭해서 츄르를 챙겨주세요!');
 
-  // 고양이들이 사무실 내에서 돌아다니는 위치 좌표 (퍼센트 %)
   const [catPositions, setCatPositions] = useState([
     { id: 1, x: 20, y: 40, dir: 1 },
     { id: 2, x: 60, y: 55, dir: -1 },
     { id: 3, x: 40, y: 70, dir: 1 },
   ]);
 
-  // 미니게임 상태
   const [isFeeding, setIsFeeding] = useState(false);
   const [gauge, setGauge] = useState(0);
   const [gaugeDir, setGaugeDir] = useState(4);
   const [bossWarning, setBossWarning] = useState(false);
 
-  // 고양이들이 사무실 안에서 이리저리 걸어 다니는 로직 (움직임 연출)
   useEffect(() => {
     const walkInterval = setInterval(() => {
       setCatPositions(prev => prev.map(pos => {
         let nextX = pos.x + pos.dir * (Math.random() * 4 + 1);
         let nextDir = pos.dir;
-        if (nextX > 85 || nextX < 10) {
-          nextDir *= -1; // 벽에 부딪히면 방향 전환
-        }
+        if (nextX > 85 || nextX < 10) nextDir *= -1;
         return { ...pos, x: nextX, dir: nextDir };
       }));
     }, 600);
     return () => clearInterval(walkInterval);
   }, []);
 
-  // 츄르 게이지 움직임
   useEffect(() => {
     let timer: any;
     if (isFeeding) {
@@ -58,7 +52,6 @@ export default function ChuruGame() {
     return () => clearInterval(timer);
   }, [isFeeding, gaugeDir]);
 
-  // 팀장님 출현 이벤트
   useEffect(() => {
     const bossInterval = setInterval(() => {
       if (Math.random() < 0.2) {
@@ -70,7 +63,6 @@ export default function ChuruGame() {
     return () => clearInterval(bossInterval);
   }, []);
 
-  // 고양이를 클릭했을 때
   const handleCatClick = (catId: number) => {
     const targetCat = cats.find(c => c.id === catId);
     if (!targetCat?.unlocked) {
@@ -115,7 +107,6 @@ export default function ChuruGame() {
     }
     setLog(resultMsg);
 
-    // 다음 고양이 해금
     setTimeout(() => {
       setCats(prev => prev.map((cat, idx) => {
         if (idx > 0 && prev[idx - 1].affection >= prev[idx - 1].maxAffection) {
@@ -146,21 +137,18 @@ export default function ChuruGame() {
 
   return (
     <main className="kkuk-theme min-h-screen bg-[#F5F0E6] py-8 px-4 flex justify-center text-stone-900">
+      {/* 구글 웹폰트 기반 손글씨 폰트를 임포트하여 새로고침 시 폰트 깨짐 현상 원천 차단 */}
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
-        @font-face {
-          font-family: 'MemomentKkukkkuk';
-          src: url('/kkuk.ttf') format('truetype'), url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/MemomentKkukkkuk.woff2') format('woff2');
-          font-weight: normal; font-display: swap;
-        }
+        
         .kkuk-theme, .kkuk-theme * {
-          font-family: 'MemomentKkukkkuk', 'Gaegu', cursive, sans-serif !important;
+          font-family: 'Gaegu', cursive, sans-serif !important;
+          font-weight: 700;
         }
       `}} />
 
       <div className="w-full max-w-md space-y-4">
         
-        {/* 상단 인트라넷 위장 헤더 */}
         <div className="bg-[#1e293b] text-white p-3 rounded-2xl flex justify-between items-center border-2 border-stone-900 shadow-md">
           <div className="text-xs flex items-center gap-2">
             <span className="w-3 h-3 bg-red-500 rounded-full inline-block animate-pulse"></span>
@@ -171,7 +159,6 @@ export default function ChuruGame() {
           </div>
         </div>
 
-        {/* 팀장님 경보 오버레이 */}
         {bossWarning && (
           <div className="bg-red-500 text-white p-4 rounded-2xl border-4 border-black text-center shadow-xl space-y-2 animate-bounce">
             <p className="text-lg font-black">🚨 팀장님 시찰 중! 들키기 전에 숨으세요!</p>
@@ -184,7 +171,6 @@ export default function ChuruGame() {
           </div>
         )}
 
-        {/* 메인 사무실 그래픽 맵 (고양이가 돌아다니는 공간) */}
         <div className="bg-[#FFFDF8] p-5 rounded-[32px] border-[3px] border-stone-900 shadow-[6px_6px_0px_#1c1917] space-y-4">
           
           <div className="flex justify-between items-center">
@@ -199,15 +185,11 @@ export default function ChuruGame() {
             </button>
           </div>
 
-          {/* 🏢 진짜 사내 오피스 그래픽 맵 박스 */}
           <div className="relative w-full h-64 bg-[#E2E8F0] border-[2.5px] border-stone-900 rounded-3xl overflow-hidden shadow-inner">
-            
-            {/* 사무실 바닥 및 책상 가구 인테리어 요소 (그래픽 느낌) */}
-            <div className="absolute top-4 left-6 w-20 h-10 bg-stone-300 border-2 border-stone-700 rounded-lg flex items-center justify-center text-[10px] font-bold">💻 개발팀 책상</div>
-            <div className="absolute top-4 right-6 w-20 h-10 bg-stone-300 border-2 border-stone-700 rounded-lg flex items-center justify-center text-[10px] font-bold">🖨️ 복사기 룸</div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-12 bg-amber-200 border-2 border-stone-700 rounded-xl flex items-center justify-center text-xs font-bold shadow-md">☕ 탕비실 식탁</div>
+            <div className="absolute top-4 left-6 w-20 h-10 bg-stone-300 border-2 border-stone-700 rounded-lg flex items-center justify-center text-[11px] font-bold">💻 개발팀 책상</div>
+            <div className="absolute top-4 right-6 w-20 h-10 bg-stone-300 border-2 border-stone-700 rounded-lg flex items-center justify-center text-[11px] font-bold">🖨️ 복사기 룸</div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-32 h-12 bg-amber-200 border-2 border-stone-700 rounded-xl flex items-center justify-center text-sm font-bold shadow-md">☕ 탕비실 식탁</div>
 
-            {/* 사무실 안을 돌아다니는 고양이들 (클릭 가능!) */}
             {catPositions.map((pos) => {
               const catInfo = cats.find(c => c.id === pos.id);
               if (!catInfo) return null;
@@ -220,7 +202,7 @@ export default function ChuruGame() {
                   style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
                 >
                   <div className="text-3xl animate-bounce">{catInfo.emoji}</div>
-                  <span className="text-[10px] bg-stone-900 text-white px-1.5 py-0.5 rounded-md font-bold shadow-sm whitespace-nowrap opacity-90 group-hover:bg-amber-500">
+                  <span className="text-xs bg-stone-900 text-white px-1.5 py-0.5 rounded-md font-bold shadow-sm whitespace-nowrap opacity-90 group-hover:bg-amber-500">
                     {catInfo.unlocked ? catInfo.name : '🔒 잠김'}
                   </span>
                 </div>
@@ -228,11 +210,10 @@ export default function ChuruGame() {
             })}
           </div>
 
-          {/* 팝업: 고양이를 클릭했을 때만 나타나는 츄르 급여 창 */}
           {activeCat && (
-            <div className="bg-[#FFF8E7] border-[2.5px] border-stone-900 rounded-2xl p-4 space-y-3 shadow-md animate-fadeIn">
+            <div className="bg-[#FFF8E7] border-[2.5px] border-stone-900 rounded-2xl p-4 space-y-3 shadow-md">
               <div className="flex justify-between items-center">
-                <h3 className="text-base font-bold flex items-center gap-1">
+                <h3 className="text-lg font-bold flex items-center gap-1">
                   <span>{activeCat.emoji}</span> <span>{activeCat.name}를 잡았다!</span>
                 </h3>
                 <button
@@ -243,15 +224,14 @@ export default function ChuruGame() {
                 </button>
               </div>
 
-              <p className="text-xs text-stone-600">{activeCat.desc}</p>
+              <p className="text-sm text-stone-600">{activeCat.desc}</p>
 
-              {/* 친밀도 게이지 */}
               <div className="space-y-1">
-                <div className="flex justify-between text-xs font-bold">
+                <div className="flex justify-between text-sm font-bold">
                   <span>친밀도</span>
                   <span>{activeCat.affection} / {activeCat.maxAffection}</span>
                 </div>
-                <div className="w-full h-3 bg-stone-200 rounded-full border-2 border-stone-900 overflow-hidden relative">
+                <div className="w-full h-3.5 bg-stone-200 rounded-full border-2 border-stone-900 overflow-hidden relative">
                   <div
                     className="h-full bg-emerald-400 transition-all duration-100"
                     style={{ width: `${(activeCat.affection / activeCat.maxAffection) * 100}%` }}
@@ -259,17 +239,16 @@ export default function ChuruGame() {
                 </div>
               </div>
 
-              {/* 미니게임 츄르 짜기 */}
               {!isFeeding ? (
                 <button
                   onClick={startFeeding}
-                  className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-stone-900 text-base font-bold rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_#1c1917] active:translate-x-[1px] active:translate-y-[1px]"
+                  className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-stone-900 text-lg font-bold rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_#1c1917]"
                 >
                   🪄 츄르 짜주기 시작!
                 </button>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-[11px] font-bold text-amber-900">파란색 구간(대성공 존)에 바가 왔을 때 버튼을 누르세요!</p>
+                  <p className="text-xs font-bold text-amber-900">파란색 구간(대성공 존)에 바가 왔을 때 버튼을 누르세요!</p>
                   <div className="w-full h-5 bg-stone-200 rounded-full border-2 border-stone-900 relative overflow-hidden">
                     <div className="absolute top-0 bottom-0 left-[45%] w-[30%] bg-blue-300/80 border-x-2 border-blue-600" />
                     <div
@@ -279,7 +258,7 @@ export default function ChuruGame() {
                   </div>
                   <button
                     onClick={stopFeeding}
-                    className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_#1c1917]"
+                    className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white text-base font-bold rounded-xl border-2 border-stone-900 shadow-[2px_2px_0px_#1c1917]"
                   >
                     🛑 쭈우욱 짜기 멈춤!
                   </button>
@@ -288,15 +267,13 @@ export default function ChuruGame() {
             </div>
           )}
 
-          {/* 상황 로그창 */}
-          <div className="p-3 bg-stone-100 rounded-2xl border-2 border-stone-900 text-xs text-stone-700 font-semibold">
+          <div className="p-3 bg-stone-100 rounded-2xl border-2 border-stone-900 text-sm text-stone-700 font-semibold">
             💬 {log}
           </div>
 
-          {/* 하단 고양이 도감 요약 */}
           <div className="pt-2 border-t-2 border-dashed border-stone-300 flex justify-around text-xs">
             {cats.map((cat) => (
-              <span key={cat.id} className={`font-bold ${cat.unlocked ? 'text-stone-900' : 'text-stone-400'}`}>
+              <span key={cat.id} className={`font-bold text-sm ${cat.unlocked ? 'text-stone-900' : 'text-stone-400'}`}>
                 {cat.emoji} {cat.name} ({Math.floor((cat.affection / cat.maxAffection) * 100)}%)
               </span>
             ))}
@@ -306,7 +283,7 @@ export default function ChuruGame() {
 
         <Link
           href="/"
-          className="block w-full py-3 bg-white text-stone-900 text-sm font-bold text-center rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917]"
+          className="block w-full py-3 bg-white text-stone-900 text-base font-bold text-center rounded-2xl border-[3px] border-stone-900 shadow-[4px_4px_0px_#1c1917]"
         >
           🏠 연구소 홈으로 돌아가기
         </Link>
