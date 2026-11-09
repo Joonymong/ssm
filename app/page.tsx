@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import SmartBanner from '@/components/SmartBanner';
+
 const TEST_LIST = [
-    {
+  {
     id: 'churu-game',
     title: '사내 고양이 츄르주기 🐈',
     desc: '근무 중에 몰래 사내 고양이에게 츄르를 주고 팀장님 눈치를 피하는 완벽한 월루 타이쿤 게임!',
@@ -8,7 +10,7 @@ const TEST_LIST = [
     tag: '신규',
     accent: 'bg-amber-400 text-stone-900'
   },
-{
+  {
     id: 'fate-travel',
     title: '사주 X 성향 운명 여행지 진단',
     desc: '생년월일시와 나의 성향이 만났을 때, 전 세계에 숨겨진 운명의 땅은?',
@@ -16,7 +18,7 @@ const TEST_LIST = [
     tag: '초강추',
     accent: 'bg-amber-800 text-white'
   },
-    {
+  {
     id: 'quit-timer',
     title: '직장인 퇴사 충동 타이머',
     desc: '실시간 시한폭탄! 내가 사직서 던지기까지 남은 시간은?',
@@ -108,68 +110,4 @@ export default function Home() {
             {/* 코 & 삐뚤빼뚤 입 */}
             <path d="M102 105 L98 112 H106 Z" fill="black" />
             <path d="M102 112 Q95 125 85 122" stroke="black" strokeWidth="3" strokeLinecap="round" fill="none" />
-            <path d="M102 112 Q110 125 120 122" stroke="black" strokeWidth="3" strokeLinecap="round" fill="none" />
-            {/* 턱살 주름 */}
-            <path d="M92 135 Q102 140 112 135" stroke="black" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-            {/* 수염 */}
-            <line x1="55" y1="110" x2="40" y2="108" stroke="black" strokeWidth="3" strokeLinecap="round" />
-            <line x1="55" y1="120" x2="38" y2="124" stroke="black" strokeWidth="3" strokeLinecap="round" />
-            <line x1="145" y1="110" x2="160" y2="108" stroke="black" strokeWidth="3" strokeLinecap="round" />
-            <line x1="145" y1="120" x2="162" y2="124" stroke="black" strokeWidth="3" strokeLinecap="round" />
-          </svg>
-        </section>
-
-        {/* 테스트 카드 리스트: 텍스트 크기와 명도 대폭 강화 */}
-        <section className="space-y-3.5 my-3">
-          {TEST_LIST.map((test) => (
-            <Link
-              key={test.id}
-              href={`/test/${test.id}`}
-              className="block p-4 bg-white border-2 border-black rounded-2xl shadow-[4px_4px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000] transition active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-3.5">
-                <span className="text-3xl p-2.5 bg-slate-50 border-2 border-black rounded-xl shrink-0">
-                  {test.emoji}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-base font-black text-black truncate">{test.title}</h2>
-                    <span className={`text-[10px] font-black text-white px-2 py-0.5 rounded-full border border-black shrink-0 ${test.accent}`}>
-                      {test.tag}
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold text-slate-700 leading-snug line-clamp-1">{test.desc}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </section>
-
-        {/* 칼럼 배너: 글자 크기와 대비 개선 */}
-        <div className="p-4 bg-amber-100 border-2 border-black rounded-2xl shadow-[4px_4px_0px_#000] flex items-center justify-between mb-6">
-          <div className="pr-2">
-            <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded">필독 리포트</span>
-            <h3 className="text-sm font-black text-black mt-1">상사 갈등 & 번아웃 대처법</h3>
-            <p className="text-[11px] font-bold text-slate-800 mt-0.5">심리학적 3단계 방어 기제</p>
-          </div>
-          <Link
-            href="/column"
-            className="text-xs font-black bg-black hover:bg-slate-800 text-white px-3.5 py-2.5 rounded-xl border border-black shadow-[2px_2px_0px_#fff] transition shrink-0"
-          >
-            읽기 →
-          </Link>
-        </div>
-
-        {/* 푸터 */}
-        <footer className="text-center text-xs font-black text-slate-800 border-t-2 border-black/20 pt-4 pb-2 space-y-1.5">
-          <p>© 2026 Mind Lab. All rights reserved.</p>
-          <div className="flex justify-center gap-4 text-xs font-bold text-black underline">
-            <Link href="/privacy">개인정보처리방침</Link>
-            <Link href="/column">연구소 리포트</Link>
-          </div>
-        </footer>
-
-      </div>
-    </main>
-  );
-}
+            <path d="M102 11
