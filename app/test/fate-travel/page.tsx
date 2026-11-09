@@ -713,5 +713,10 @@ export default function FateTravelTest() {
 
       </div>
     </main>
+
+    import SmartBanner from '@/components/SmartBanner';
+
+// 페이지 내부 return문 안의 원하는 위치에 배치
+<SmartBanner />
   );
 }
